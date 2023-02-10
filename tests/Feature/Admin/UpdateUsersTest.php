@@ -266,4 +266,74 @@ class UpdateUsersTest extends TestCase
 
         $this->assertDatabaseMissing('users', ['first_name' => 'Pepe']);
     }
+
+    /** @test - Ejercicio 1 */
+    function the_bio_is_required()
+    {
+        $this->withExceptionHandling();
+
+        $user = factory(User::class)->create();
+
+        $this->from('usuarios/'. $user->id .'/editar')
+            ->put('usuarios/'. $user->id, $this->getValidData([
+                'bio' => '',
+            ]))->assertRedirect('usuarios/' . $user->id . '/editar')
+            ->assertSessionHasErrors(['bio']);
+
+        $this->assertDatabaseMissing('users', ['first_name' => 'Pepe']);
+    }
+
+    /** @test - Ejercicio 1 */
+    function the_twitter_field_is_optional()
+    {
+        $this->withExceptionHandling();
+
+        $user = factory(User::class)->create();
+
+        $this->from('usuarios/'.$user->id.'/editar')
+            ->put('usuarios/'.$user->id, $this->getValidData([
+                'twitter' => null,
+            ]));
+
+        $this->assertDatabaseHas('users', ['first_name' => 'Pepe']);
+    }
+
+    /** @test - Ejercicio 1 */
+    public function the_twitter_field_must_be_present()
+    {
+        $this->withExceptionHandling();
+
+        $user = factory(User::class)->create();
+
+        $this->from('usuarios/' . $user->id . '/editar')
+            ->put('usuarios/' . $user->id, [
+                'first_name' => 'Pepe',
+                'last_name' => 'Pérez',
+                'email' => 'pepe@mail.es',
+                'password' => '123456',
+                'profession_id' => '',
+                'bio' => 'Programador de Laravel y Vue.js',
+                'role' => 'user',
+                'state' => 'active',
+            ])->assertSessionHasErrors('twitter', ['first_name' => 'Pepe']);
+
+        $this->assertDatabaseMissing('users', ['first_name' => 'Pepe']);
+    }
+
+    /** @test - Ejercicio 1 */
+    public function the_twitter_field_must_be_an_url()
+    {
+        $this->withExceptionHandling();
+
+        $user = factory(User::class)->create();
+
+        $this->from('usuarios/' . $user->id . '/editar')
+            ->put('usuarios/' . $user->id, $this->getValidData([
+                'twitter' => 'url-no-valida'
+            ]))->assertRedirect('usuarios/' . $user->id . '/editar')
+            ->assertSessionHasErrors('twitter');
+
+        $this->assertDatabaseMissing('users', ['first_name' => 'Pepe']);
+    }
+
 }
