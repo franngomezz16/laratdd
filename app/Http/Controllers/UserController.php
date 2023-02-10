@@ -2,7 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\{Http\Requests\CreateUserRequest, Http\Requests\UpdateUserRequest, Profession, Skill, Sortable, User};
+use App\{Http\Requests\CreateUserRequest,
+    Http\Requests\UpdateUserRequest,
+    Profession,
+    Skill,
+    Sortable,
+    User,
+    UserProfile};
 use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
@@ -93,6 +99,19 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('users');
+    }
+
+    public function restore($id)
+    {
+        $user = User::withTrashed()->where('id', '=', $id)->first();
+        $user_profile = UserProfile::withTrashed()->where('id', '=', $id)->first();
+
+        $user_profile->restore();
+        $user->restore();
+
+        $user->profile()->update($user_profile->getAttributes());
+
+        return redirect()->route('users.index');
     }
 
     /*public function trashed(Sortable $sortable)

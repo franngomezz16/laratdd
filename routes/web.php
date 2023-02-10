@@ -44,6 +44,8 @@ Route::get('profesiones', 'ProfessionController@index')
 Route::delete('profesiones/{profession}', 'ProfessionController@destroy')
     ->name('profession.destroy');
 
+Route::get('usuarios/papelera/{id}', 'UserController@restore')->name('users.restore');
+
 Route::get('habilidades', 'SkillController@index')
     ->name('skill.index');
 
